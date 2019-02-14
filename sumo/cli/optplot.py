@@ -18,7 +18,7 @@ mpl.use('Agg')
 
 from pymatgen.io.vasp import Vasprun
 from pymatgen.util.string import latexify
-from sumo.io import questaal
+from sumo.io import questaal, vasp_rpa
 
 from sumo.plotting.optics_plotter import SOpticsPlotter
 from sumo.electronic_structure.optics import (broaden_eps, calculate_alpha,
@@ -98,7 +98,7 @@ def optplot(filenames=None, prefix=None, directory=None, codes='vasp',
 
     ##### BUILD LIST OF FILES AUTOMATICALLY IF NECESSARY #####
 
-    if codes == 'vasp':
+    if codes in ('vasp', 'vasp-rpa'):
         if not filenames:
             if os.path.exists('vasprun.xml'):
                 filenames = ['vasprun.xml']
@@ -145,6 +145,11 @@ def optplot(filenames=None, prefix=None, directory=None, codes='vasp',
                     vr.get_band_structure().get_band_gap()['energy'])
             else:
                 auto_band_gaps.append(None)
+
+        elif code == 'vasp-rpa':
+            dielectrics.append(
+                vasp_rpa.dielectric_from_vasprun(filename))
+            auto_band_gaps.append(None)
 
         elif code == 'questaal':
             if not save_files:
